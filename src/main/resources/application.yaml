@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: FinancialManagement
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_FinancialManagement?useSSL=false&serverTimezone=UTC
+    username: root
+    password: sua senha
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
