@@ -17,10 +17,17 @@ public class PessoaController {
         this.servicePessoa = servicePessoa;
     }
 
-    @PostMapping
+    @PostMapping("salvar")
     public ResponseEntity<Pessoa> salvarPessoa(@RequestBody Pessoa pessoa){
         Pessoa pessoaSalva = servicePessoa.salvarPessoa(pessoa);
 
         return ResponseEntity.ok(pessoaSalva);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<Void> login(@RequestBody Pessoa pessoa){
+        servicePessoa.confirmarSenha(pessoa);
+
+        return ResponseEntity.noContent().build();
     }
 }

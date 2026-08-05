@@ -23,8 +23,6 @@ public class Conta {
     private LocalDate data;
     @NotBlank
     private String mes;
-    private BigDecimal totalReceita;
-    private BigDecimal totalDespesa;
 
     @Enumerated(EnumType.STRING)
     private TipoConta tipoConta;
@@ -81,22 +79,6 @@ public class Conta {
 
     public void setMes(String mes) {
         this.mes = mes;
-    }
-
-    public BigDecimal getTotalReceita() {
-        return totalReceita;
-    }
-
-    public void setTotalReceita(BigDecimal totalReceita) {
-        this.totalReceita = totalReceita;
-    }
-
-    public BigDecimal getTotalDespesa() {
-        return totalDespesa;
-    }
-
-    public void setTotalDespesa(BigDecimal totalDespesa) {
-        this.totalDespesa = totalDespesa;
     }
 
     public TipoConta getTipoConta() {

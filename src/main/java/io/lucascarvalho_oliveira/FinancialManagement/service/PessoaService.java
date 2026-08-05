@@ -2,16 +2,23 @@ package io.lucascarvalho_oliveira.FinancialManagement.service;
 
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.SenhaInvalidaException;
+import io.lucascarvalho_oliveira.FinancialManagement.model.Conta;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Pessoa;
+import io.lucascarvalho_oliveira.FinancialManagement.model.enums.TipoConta;
+import io.lucascarvalho_oliveira.FinancialManagement.repository.ContaRepository;
 import io.lucascarvalho_oliveira.FinancialManagement.repository.PessoaRepository;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class PessoaService {
     private final PessoaRepository repositoryPessoa;
+    private final ContaRepository repositoryConta;
 
-    public PessoaService(PessoaRepository repositoryPessoa){
+    public PessoaService(PessoaRepository repositoryPessoa, ContaRepository repositoryConta){
         this.repositoryPessoa = repositoryPessoa;
+        this.repositoryConta = repositoryConta;
     }
 
     public Pessoa salvarPessoa(Pessoa pessoa){
@@ -30,14 +37,30 @@ public class PessoaService {
         return repositoryPessoa.save(pessoa);
     }
 
-    public Boolean confirmaSenha(Pessoa pessoa){
+    public void confirmarSenha(Pessoa pessoa){
         Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(pessoa.getEmail())
                 .orElseThrow(() -> new PessoaNaoEncontradaException("Email invalido"));
 
         if(!pessoa.getSenha().equals(pessoaEncontrada.getSenha())){
             throw new SenhaInvalidaException("Senha invalida");
         }
+    }
 
-        return true;
+    public void somarConta(Conta conta, Integer idPessoa){
+
+        Pessoa pessoa = repositoryPessoa.findById(idPessoa)
+                .orElseThrow(() -> new PessoaNaoEncontradaException("Usuário não encontrado"));
+
+        if(conta.getTipoConta() == TipoConta.RECEITA){
+            BigDecimal soma = repositoryConta.totalReceitaPessoa(pessoa.getId());
+            pessoa.setTotalReceita(soma);
+        }
+
+        if(conta.getTipoConta() == TipoConta.DESPESA){
+            BigDecimal soma = repositoryConta.totalDespesaPessoa(pessoa.getId());
+            pessoa.setTotalDespesa(soma);
+        }
+
+        repositoryPessoa.save(pessoa);
     }
 }

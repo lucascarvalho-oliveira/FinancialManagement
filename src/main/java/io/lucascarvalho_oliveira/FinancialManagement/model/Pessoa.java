@@ -3,6 +3,7 @@ package io.lucascarvalho_oliveira.FinancialManagement.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class Pessoa {
     private String email;
     @NotBlank
     private String senha;
+
+    private BigDecimal totalReceita;
+    private BigDecimal totalDespesa;
 
     @OneToMany(mappedBy = "pessoa")
     List<Conta> contas;
@@ -63,6 +67,22 @@ public class Pessoa {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public BigDecimal getTotalReceita() {
+        return totalReceita;
+    }
+
+    public void setTotalReceita(BigDecimal totalReceita) {
+        this.totalReceita = totalReceita;
+    }
+
+    public BigDecimal getTotalDespesa() {
+        return totalDespesa;
+    }
+
+    public void setTotalDespesa(BigDecimal totalDespesa) {
+        this.totalDespesa = totalDespesa;
     }
 
     public List<Conta> getContas() {
