@@ -1,5 +1,8 @@
 package io.lucascarvalho_oliveira.FinancialManagement.controller;
 
+import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginRespostaDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.ResumoFinanceiroDto;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Pessoa;
 import io.lucascarvalho_oliveira.FinancialManagement.service.PessoaService;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +28,14 @@ public class PessoaController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<Void> login(@RequestBody Pessoa pessoa){
-        servicePessoa.confirmarSenha(pessoa);
+    public ResponseEntity<LoginRespostaDto> login (@RequestBody LoginDto dto){
+        LoginRespostaDto pessoa = servicePessoa.login(dto);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(pessoa);
+    }
+
+    @GetMapping("resumo/{id}")
+    public ResponseEntity<ResumoFinanceiroDto> resumo(@PathVariable Integer id){
+        return ResponseEntity.ok(servicePessoa.resumoFinanceiro(id));
     }
 }

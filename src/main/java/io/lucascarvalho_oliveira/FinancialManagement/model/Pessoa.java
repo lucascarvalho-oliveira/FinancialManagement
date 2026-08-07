@@ -1,5 +1,6 @@
 package io.lucascarvalho_oliveira.FinancialManagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -25,6 +26,7 @@ public class Pessoa {
     private BigDecimal totalDespesa;
 
     @OneToMany(mappedBy = "pessoa")
+    @JsonIgnore
     List<Conta> contas;
 
     protected Pessoa(){}

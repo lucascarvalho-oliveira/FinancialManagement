@@ -1,5 +1,9 @@
 package io.lucascarvalho_oliveira.FinancialManagement.service;
 
+import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginRespostaDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.ResumoFinanceiroDto;
+import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaExistente;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.SenhaInvalidaException;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Conta;
@@ -22,6 +26,10 @@ public class PessoaService {
     }
 
     public Pessoa salvarPessoa(Pessoa pessoa){
+        if(repositoryPessoa.findByEmail(pessoa.getEmail()).isPresent()){
+            throw new PessoaExistente("Pessoa ja cadastrada");
+        }
+
         if(pessoa.getSenha().length() < 8){
             throw new SenhaInvalidaException("A senha deve ter no minimo 8 caracteres");
         }
@@ -37,13 +45,14 @@ public class PessoaService {
         return repositoryPessoa.save(pessoa);
     }
 
-    public void confirmarSenha(Pessoa pessoa){
-        Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(pessoa.getEmail())
+    public LoginRespostaDto login(LoginDto dto){
+        Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(dto.email())
                 .orElseThrow(() -> new PessoaNaoEncontradaException("Email invalido"));
 
-        if(!pessoa.getSenha().equals(pessoaEncontrada.getSenha())){
+        if(!pessoaEncontrada.getSenha().equals(dto.senha())){
             throw new SenhaInvalidaException("Senha invalida");
         }
+        return new LoginRespostaDto("Login feito com sucesso");
     }
 
     public void somarConta(Conta conta, Integer idPessoa){
@@ -62,5 +71,16 @@ public class PessoaService {
         }
 
         repositoryPessoa.save(pessoa);
+    }
+
+    public ResumoFinanceiroDto resumoFinanceiro(Integer id){
+        Pessoa pessoa = repositoryPessoa.findById(id)
+                .orElseThrow(() -> new PessoaNaoEncontradaException("Pessoa não encontrada"));
+
+        BigDecimal receita = pessoa.getTotalReceita();
+        BigDecimal despesa = pessoa.getTotalDespesa();
+        BigDecimal saldo = receita.subtract(despesa);
+
+        return new ResumoFinanceiroDto(receita, despesa, saldo);
     }
 }

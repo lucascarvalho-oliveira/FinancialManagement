@@ -1,8 +1,10 @@
 package io.lucascarvalho_oliveira.FinancialManagement.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.lucascarvalho_oliveira.FinancialManagement.model.enums.TipoConta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
@@ -19,7 +21,8 @@ public class Conta {
     private String nome;
     @Positive
     private BigDecimal valor;
-    @NotBlank
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    @NotNull
     private LocalDate data;
     @NotBlank
     private String mes;
@@ -33,12 +36,13 @@ public class Conta {
 
     protected Conta(){}
 
-    public Conta(String nome, BigDecimal valor, LocalDate data, String mes, TipoConta tipoConta) {
+    public Conta(String nome, BigDecimal valor, LocalDate data, String mes, TipoConta tipoConta, Pessoa pessoa) {
         this.nome = nome;
         this.valor = valor;
         this.data = data;
         this.mes = mes;
         this.tipoConta = tipoConta;
+        this.pessoa = pessoa;
     }
 
     public Integer getId() {

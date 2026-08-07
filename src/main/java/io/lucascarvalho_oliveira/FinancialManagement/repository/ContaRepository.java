@@ -9,12 +9,12 @@ import java.math.BigDecimal;
 
 public interface ContaRepository extends JpaRepository<Conta, Integer> {
 
-    // Soma os valores de cada conta e retorna o total em totalReceitaPessoa
+    // Soma os valores de cada receita em conta e retorna o total em totalReceitaPessoa
     @Query("SELECT COALESCE(SUM(c.valor), 0) FROM Conta c WHERE c.pessoa.id = :idPessoa AND c.tipoConta = 'RECEITA'")
     BigDecimal totalReceitaPessoa(@Param("idPessoa") Integer idPessoa);
 
-    // Soma os valores de cada conta e retorna o total em totalDespesaPessoa
-    @Query("SELECT COALESCE(SUM(c.valor), 0) FROM Conta c WHERE c.pessoa.id = :idPessoa AND c.TipoConta = 'DESPESA'")
+    // Soma os valores de cada despesa em conta e retorna o total em totalDespesaPessoa
+    @Query("SELECT COALESCE(SUM(c.valor), 0) FROM Conta c WHERE c.pessoa.id = :idPessoa AND c.tipoConta = 'DESPESA'")
     BigDecimal totalDespesaPessoa(@Param("idPessoa") Integer idPessoa);
 
 }

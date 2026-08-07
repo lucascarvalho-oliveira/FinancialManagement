@@ -1,6 +1,7 @@
 package io.lucascarvalho_oliveira.FinancialManagement.exception;
 
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.ContaNaoEncontradaException;
+import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaExistente;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.SenhaInvalidaException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PessoaExistente.class)
+    public ResponseEntity<ErroResponse> handlePessoaExistente(
+            PessoaExistente ex, HttpServletRequest request){
+
+        ErroResponse erro = new ErroResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage()
+        );
+        return  new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ContaNaoEncontradaException.class)
     public ResponseEntity<ErroResponse> handleContaNaoEncontrada(
             ContaNaoEncontradaException ex, HttpServletRequest request){
 
