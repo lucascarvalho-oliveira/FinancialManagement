@@ -4,8 +4,10 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/db_FinancialManagement?useSSL=false&serverTimezone=UTC
     username: root
-    password: sua senha
+    password: senha
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
+  jwt:
+    secret: crie-uma-chave
