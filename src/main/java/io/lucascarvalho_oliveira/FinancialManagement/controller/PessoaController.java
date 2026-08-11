@@ -5,6 +5,7 @@ import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginRespostaDto;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.ResumoFinanceiroDto;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Pessoa;
 import io.lucascarvalho_oliveira.FinancialManagement.service.PessoaService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +22,14 @@ public class PessoaController {
     }
 
     @PostMapping("salvar")
-    public ResponseEntity<Pessoa> salvarPessoa(@RequestBody Pessoa pessoa){
+    public ResponseEntity<Pessoa> salvarPessoa(@Valid @RequestBody Pessoa pessoa){
         Pessoa pessoaSalva = servicePessoa.salvarPessoa(pessoa);
 
         return ResponseEntity.ok(pessoaSalva);
     }
 
     @PostMapping("login")
-    public ResponseEntity<LoginRespostaDto> login (@RequestBody LoginDto dto){
+    public ResponseEntity<LoginRespostaDto> login (@Valid @RequestBody LoginDto dto){
         LoginRespostaDto pessoa = servicePessoa.login(dto);
 
         return ResponseEntity.ok(pessoa);

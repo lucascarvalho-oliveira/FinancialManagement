@@ -3,6 +3,7 @@ package io.lucascarvalho_oliveira.FinancialManagement.controller;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.ContaDto;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Conta;
 import io.lucascarvalho_oliveira.FinancialManagement.service.ContaService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class ContaController {
     }
 
     @PostMapping("salvar")
-    public ResponseEntity<Conta> salvarPessoa(@RequestBody Conta conta){
+    public ResponseEntity<Conta> salvarPessoa(@Valid @RequestBody Conta conta){
         Conta salvarConta = serviceConta.salvarConta(conta);
 
         return ResponseEntity.ok(salvarConta);

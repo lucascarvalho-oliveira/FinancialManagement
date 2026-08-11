@@ -1,5 +1,6 @@
 package io.lucascarvalho_oliveira.FinancialManagement.service;
 
+import io.lucascarvalho_oliveira.FinancialManagement.config.PasswordConfig;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginDto;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginRespostaDto;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.ResumoFinanceiroDto;
@@ -11,6 +12,7 @@ import io.lucascarvalho_oliveira.FinancialManagement.model.Pessoa;
 import io.lucascarvalho_oliveira.FinancialManagement.model.enums.TipoConta;
 import io.lucascarvalho_oliveira.FinancialManagement.repository.ContaRepository;
 import io.lucascarvalho_oliveira.FinancialManagement.repository.PessoaRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,10 +21,16 @@ import java.math.BigDecimal;
 public class PessoaService {
     private final PessoaRepository repositoryPessoa;
     private final ContaRepository repositoryConta;
+    private final PasswordConfig configPassword;
+    private final JwtService serviceJwt;
 
-    public PessoaService(PessoaRepository repositoryPessoa, ContaRepository repositoryConta){
+    public PessoaService(PessoaRepository repositoryPessoa, ContaRepository repositoryConta,
+                         PasswordConfig configPassword, JwtService serviceJwt){
+
         this.repositoryPessoa = repositoryPessoa;
         this.repositoryConta = repositoryConta;
+        this.configPassword = configPassword;
+        this.serviceJwt = serviceJwt;
     }
 
     public Pessoa salvarPessoa(Pessoa pessoa){
@@ -42,6 +50,8 @@ public class PessoaService {
             throw new SenhaInvalidaException("A senha deve conter pelo menos 1 letra maiúscula ou 1 símbolo");
         }
 
+        pessoa.setSenha(configPassword.passwordEncoder().encode(pessoa.getSenha()));
+
         return repositoryPessoa.save(pessoa);
     }
 
@@ -49,10 +59,14 @@ public class PessoaService {
         Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(dto.email())
                 .orElseThrow(() -> new PessoaNaoEncontradaException("Email invalido"));
 
-        if(!pessoaEncontrada.getSenha().equals(dto.senha())){
+        if(!configPassword.passwordEncoder().matches(
+                dto.senha(), pessoaEncontrada.getSenha())){
             throw new SenhaInvalidaException("Senha invalida");
         }
-        return new LoginRespostaDto("Login feito com sucesso");
+
+        String token = serviceJwt.gerarToken(pessoaEncontrada.getEmail());
+
+        return new LoginRespostaDto("Login feito com sucesso", token);
     }
 
     public void somarConta(Conta conta, Integer idPessoa){
