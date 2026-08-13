@@ -1,14 +1,30 @@
 spring:
   application:
     name: FinancialManagement
+
+  # Dados do banco de dados
   datasource:
     url: jdbc:mysql://localhost:3306/db_FinancialManagement?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: senha
+    password: sua senha
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
 
+# Email do proprietário
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: SEU_EMAIL@gmail.com
+    password: SUA_SENHA_DE_APP
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Token do sistema de login
 jwt:
-  secret: chave-segura
+  secret: uma-chave-token-segura
