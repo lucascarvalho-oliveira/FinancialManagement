@@ -22,6 +22,8 @@ public class Pessoa {
     @NotBlank
     private String senha;
 
+    private boolean emailVerificado;
+
     private BigDecimal totalReceita;
     private BigDecimal totalDespesa;
 
@@ -69,6 +71,14 @@ public class Pessoa {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public boolean isEmailVerificado() {
+        return emailVerificado;
+    }
+
+    public void setEmailVerificado(boolean emailVerificado) {
+        this.emailVerificado = emailVerificado;
     }
 
     public BigDecimal getTotalReceita() {

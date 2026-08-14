@@ -52,12 +52,18 @@ public class PessoaService {
 
         pessoa.setSenha(configPassword.passwordEncoder().encode(pessoa.getSenha()));
 
+        pessoa.setEmailVerificado(false);
+
         return repositoryPessoa.save(pessoa);
     }
 
     public LoginRespostaDto login(LoginDto dto){
         Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(dto.email())
                 .orElseThrow(() -> new PessoaNaoEncontradaException("Email invalido"));
+
+        if (!pessoaEncontrada.isEmailVerificado()) {
+            throw new RuntimeException("E-mail ainda não foi verificado");
+        }
 
         if(!configPassword.passwordEncoder().matches(
                 dto.senha(), pessoaEncontrada.getSenha())){
