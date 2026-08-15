@@ -2,6 +2,7 @@ package io.lucascarvalho_oliveira.FinancialManagement.service;
 
 import io.lucascarvalho_oliveira.FinancialManagement.config.PasswordConfig;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.*;
+import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.LoginExeption;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaExistente;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.SenhaInvalidaException;
@@ -59,7 +60,7 @@ public class PessoaService {
                 .orElseThrow(() -> new PessoaNaoEncontradaException("Email invalido"));
 
         if (!pessoaEncontrada.isEmailVerificado()) {
-            throw new RuntimeException("E-mail ainda não foi verificado");
+            throw new LoginExeption("E-mail ainda não foi verificado");
         }
 
         if(!configPassword.passwordEncoder().matches(dto.senha(), pessoaEncontrada.getSenha())){

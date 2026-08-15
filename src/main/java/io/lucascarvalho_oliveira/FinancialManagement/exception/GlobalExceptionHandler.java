@@ -64,4 +64,15 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(LoginExeption.class)
+    public ResponseEntity<ErroResponse> handleLogin(
+            LoginExeption ex, HttpServletRequest request){
+
+        ErroResponse erro = new ErroResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
+    }
 }
