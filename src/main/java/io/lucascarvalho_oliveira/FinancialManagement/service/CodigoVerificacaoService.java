@@ -1,6 +1,6 @@
 package io.lucascarvalho_oliveira.FinancialManagement.service;
 
-import io.lucascarvalho_oliveira.FinancialManagement.dto.VerificacaoRespostaDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.RespostaDto;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.CodigoIncorretoExeption;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.model.CodigoVerificacao;
@@ -32,7 +32,7 @@ public class CodigoVerificacaoService {
         return  repositoryVerificacao.save(verificacao);
     }
 
-    public VerificacaoRespostaDto verificarEmail(String email, String codigo){
+    public RespostaDto verificarEmail(String email, String codigo){
         CodigoVerificacao encontrado = repositoryVerificacao.findByEmailAndCodigo(email, codigo)
                 .orElseThrow(() -> new CodigoIncorretoExeption("Código invalido"));
 
@@ -48,6 +48,6 @@ public class CodigoVerificacaoService {
         pessoa.setEmailVerificado(true);
         repositoryPessoa.save(pessoa);
 
-        return new VerificacaoRespostaDto("Código valido!");
+        return new RespostaDto("Código valido!");
     }
 }

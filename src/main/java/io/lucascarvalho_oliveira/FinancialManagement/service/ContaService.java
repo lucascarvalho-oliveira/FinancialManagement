@@ -1,6 +1,6 @@
 package io.lucascarvalho_oliveira.FinancialManagement.service;
 
-import io.lucascarvalho_oliveira.FinancialManagement.dto.ContaDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.ContaRequestDto;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.ContaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Conta;
 import io.lucascarvalho_oliveira.FinancialManagement.repository.ContaRepository;
@@ -27,10 +27,10 @@ public class ContaService {
         return contaSalva;
     }
 
-    public List<ContaDto> listarConta(){
+    public List<ContaRequestDto> listarConta(){
 
         return repositoryConta.findAll().stream()
-                .map(conta -> new ContaDto(
+                .map(conta -> new ContaRequestDto(
                         conta.getId(),
                         conta.getNome(),
                         conta.getValor(),

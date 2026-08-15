@@ -1,6 +1,6 @@
 package io.lucascarvalho_oliveira.FinancialManagement.controller;
 
-import io.lucascarvalho_oliveira.FinancialManagement.dto.ContaDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.ContaRequestDto;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Conta;
 import io.lucascarvalho_oliveira.FinancialManagement.service.ContaService;
 import jakarta.validation.Valid;
@@ -26,8 +26,8 @@ public class ContaController {
     }
 
     @GetMapping("listar")
-    public ResponseEntity<List<ContaDto>> ListarConta(){
-        List<ContaDto> contas = serviceConta.listarConta();
+    public ResponseEntity<List<ContaRequestDto>> ListarConta(){
+        List<ContaRequestDto> contas = serviceConta.listarConta();
 
         return ResponseEntity.ok(contas);
     }

@@ -6,7 +6,7 @@ import io.lucascarvalho_oliveira.FinancialManagement.model.enums.TipoConta;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record ContaDto(
+public record ContaRequestDto(
         Integer id,
         String nome,
         BigDecimal valor,

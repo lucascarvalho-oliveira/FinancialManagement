@@ -1,9 +1,7 @@
 package io.lucascarvalho_oliveira.FinancialManagement.service;
 
 import io.lucascarvalho_oliveira.FinancialManagement.config.PasswordConfig;
-import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginDto;
-import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginRespostaDto;
-import io.lucascarvalho_oliveira.FinancialManagement.dto.ResumoFinanceiroDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.*;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaExistente;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.PessoaNaoEncontradaException;
 import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.SenhaInvalidaException;
@@ -12,7 +10,6 @@ import io.lucascarvalho_oliveira.FinancialManagement.model.Pessoa;
 import io.lucascarvalho_oliveira.FinancialManagement.model.enums.TipoConta;
 import io.lucascarvalho_oliveira.FinancialManagement.repository.ContaRepository;
 import io.lucascarvalho_oliveira.FinancialManagement.repository.PessoaRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -57,7 +54,7 @@ public class PessoaService {
         return repositoryPessoa.save(pessoa);
     }
 
-    public LoginRespostaDto login(LoginDto dto){
+    public LoginRespostaDto login(LoginRequestDto dto){
         Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(dto.email())
                 .orElseThrow(() -> new PessoaNaoEncontradaException("Email invalido"));
 
@@ -65,14 +62,28 @@ public class PessoaService {
             throw new RuntimeException("E-mail ainda não foi verificado");
         }
 
-        if(!configPassword.passwordEncoder().matches(
-                dto.senha(), pessoaEncontrada.getSenha())){
+        if(!configPassword.passwordEncoder().matches(dto.senha(), pessoaEncontrada.getSenha())){
             throw new SenhaInvalidaException("Senha invalida");
         }
 
         String token = serviceJwt.gerarToken(pessoaEncontrada.getEmail());
 
         return new LoginRespostaDto("Login feito com sucesso", token);
+    }
+
+    public RespostaDto trocarEmail(RedevinirEmailDto dto){
+        Pessoa pessoaEncontrada = repositoryPessoa.findByEmail(dto.emailAntigo())
+                .orElseThrow(() -> new PessoaNaoEncontradaException("Usuário não encontrado"));
+
+        if(!configPassword.passwordEncoder().matches(dto.senha(), pessoaEncontrada.getSenha())){
+            throw new SenhaInvalidaException("Senha incorreta!");
+        }
+
+        pessoaEncontrada.setEmail(dto.emailNovo());
+        repositoryPessoa.save(pessoaEncontrada);
+
+        return new RespostaDto("Email salvo com sucesso");
+
     }
 
     public void somarConta(Conta conta, Integer idPessoa){

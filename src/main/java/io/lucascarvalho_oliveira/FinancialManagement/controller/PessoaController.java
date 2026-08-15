@@ -1,15 +1,11 @@
 package io.lucascarvalho_oliveira.FinancialManagement.controller;
 
-import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginDto;
-import io.lucascarvalho_oliveira.FinancialManagement.dto.LoginRespostaDto;
-import io.lucascarvalho_oliveira.FinancialManagement.dto.ResumoFinanceiroDto;
+import io.lucascarvalho_oliveira.FinancialManagement.dto.*;
 import io.lucascarvalho_oliveira.FinancialManagement.model.Pessoa;
 import io.lucascarvalho_oliveira.FinancialManagement.service.PessoaService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Scanner;
 
 @RestController
 @RequestMapping("pessoa")
@@ -28,8 +24,15 @@ public class PessoaController {
         return ResponseEntity.ok(pessoaSalva);
     }
 
+    @PutMapping("atualizar")
+    public ResponseEntity<RespostaDto> trocarEmail(@RequestBody RedevinirEmailDto dto){
+        RespostaDto resposta = servicePessoa.trocarEmail(dto);
+
+        return ResponseEntity.ok(resposta);
+    }
+
     @PostMapping("login")
-    public ResponseEntity<LoginRespostaDto> login (@Valid @RequestBody LoginDto dto){
+    public ResponseEntity<LoginRespostaDto> login (@Valid @RequestBody LoginRequestDto dto){
         LoginRespostaDto pessoa = servicePessoa.login(dto);
 
         return ResponseEntity.ok(pessoa);
