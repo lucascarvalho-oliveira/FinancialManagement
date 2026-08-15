@@ -25,7 +25,7 @@ public class PessoaController {
     }
 
     @PutMapping("atualizar")
-    public ResponseEntity<RespostaDto> trocarEmail(@RequestBody RedevinirEmailDto dto){
+    public ResponseEntity<RespostaDto> trocarEmail(@Valid @RequestBody RedevinirEmailDto dto){
         RespostaDto resposta = servicePessoa.trocarEmail(dto);
 
         return ResponseEntity.ok(resposta);

@@ -79,7 +79,12 @@ public class PessoaService {
             throw new SenhaInvalidaException("Senha incorreta!");
         }
 
+        if(repositoryPessoa.findByEmail(dto.emailNovo()).isPresent()){
+            throw new PessoaExistente("Email ja cadastrado");
+        }
+
         pessoaEncontrada.setEmail(dto.emailNovo());
+        pessoaEncontrada.setEmailVerificado(false);
         repositoryPessoa.save(pessoaEncontrada);
 
         return new RespostaDto("Email salvo com sucesso");
