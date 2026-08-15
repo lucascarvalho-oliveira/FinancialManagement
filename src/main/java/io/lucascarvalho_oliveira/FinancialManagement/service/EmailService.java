@@ -1,8 +1,10 @@
 package io.lucascarvalho_oliveira.FinancialManagement.service;
 
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.EmailRespostaDto;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -10,10 +12,10 @@ import java.util.Random;
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final Resend resend;
 
-    public EmailService(JavaMailSender mailSender){
-        this.mailSender = mailSender;
+    public EmailService(@Value("${resend.api-key}") String apiKey){
+        this.resend = new Resend(apiKey);
     }
 
     public String gerarCodigo(){
@@ -22,14 +24,18 @@ public class EmailService {
         return String.valueOf(codigo);
     }
 
-    public EmailRespostaDto envioEmail(String email, String codigo){
-        SimpleMailMessage mensagem = new SimpleMailMessage();
+    public EmailRespostaDto envioEmail(String email, String codigo) throws ResendException {
 
-        mensagem.setTo(email);
-        mensagem.setSubject("Verificação de e-mail");
-        mensagem.setText("Seu código de verificação é: " + codigo);
+        CreateEmailOptions emailOptions = CreateEmailOptions.builder()
+                .from("Financial Management <noreply@lucascode.api.br>")
+                .to(email)
+                .subject("Código de verificação")
+                .html( "<h2>Verificação de e-mail</h2>" +
+                        "<p>Seu código de verificação é:</p>" +
+                        "<h1>" + codigo + "</h1>"
+                ).build();
 
-        mailSender.send(mensagem);
+        resend.emails().send(emailOptions);
 
         EmailRespostaDto dto = new EmailRespostaDto("Email enviado com sucesso!", codigo);
 

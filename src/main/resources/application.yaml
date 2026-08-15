@@ -3,8 +3,8 @@ spring:
     name: FinancialManagement
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER}
     password: ${DB_PASSWORD}
 
   jpa:
@@ -12,20 +12,11 @@ spring:
       ddl-auto: validate
     show-sql: true
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-server:
-  port: ${PORT:8080}
+resend:
+  api-key: ${RESEND_API_KEY}
 
 jwt:
   secret: ${JWT_SECRET}
+
+server:
+  port: ${PORT:8080}
