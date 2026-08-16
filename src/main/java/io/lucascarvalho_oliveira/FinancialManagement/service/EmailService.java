@@ -4,6 +4,7 @@ import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
 import io.lucascarvalho_oliveira.FinancialManagement.dto.EmailRespostaDto;
+import io.lucascarvalho_oliveira.FinancialManagement.exception.exceptions.EmailEnvioExeption;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class EmailService {
         return String.valueOf(codigo);
     }
 
-    public EmailRespostaDto envioEmail(String email, String codigo) throws ResendException {
+    public EmailRespostaDto envioEmail(String email, String codigo){
 
         try {
             CreateEmailOptions emailOptions = CreateEmailOptions.builder()
@@ -38,10 +39,9 @@ public class EmailService {
 
             resend.emails().send(emailOptions);
         }catch (ResendException e){
-
+            throw new EmailEnvioExeption("Erro ao enviar o email");
         }
-        EmailRespostaDto dto = new EmailRespostaDto("Email enviado com sucesso!", codigo);
 
-        return dto;
+        return new EmailRespostaDto("Email enviado com sucesso!", codigo);
     }
 }
