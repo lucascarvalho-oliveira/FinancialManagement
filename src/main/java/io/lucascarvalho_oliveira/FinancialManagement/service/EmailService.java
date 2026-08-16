@@ -26,17 +26,20 @@ public class EmailService {
 
     public EmailRespostaDto envioEmail(String email, String codigo) throws ResendException {
 
-        CreateEmailOptions emailOptions = CreateEmailOptions.builder()
-                .from("Financial Management <noreply@lucascode.api.br>")
-                .to(email)
-                .subject("Código de verificação")
-                .html( "<h2>Verificação de e-mail</h2>" +
-                        "<p>Seu código de verificação é:</p>" +
-                        "<h1>" + codigo + "</h1>"
-                ).build();
+        try {
+            CreateEmailOptions emailOptions = CreateEmailOptions.builder()
+                    .from("Financial Management <noreply@lucascode.api.br>")
+                    .to(email)
+                    .subject("Código de verificação")
+                    .html("<h2>Verificação de e-mail</h2>" +
+                            "<p>Seu código de verificação é:</p>" +
+                            "<h1>" + codigo + "</h1>"
+                    ).build();
 
-        resend.emails().send(emailOptions);
+            resend.emails().send(emailOptions);
+        }catch (ResendException e){
 
+        }
         EmailRespostaDto dto = new EmailRespostaDto("Email enviado com sucesso!", codigo);
 
         return dto;

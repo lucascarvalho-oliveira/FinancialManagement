@@ -55,8 +55,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CodigoIncorretoExeption.class)
-    public  ResponseEntity<ErroResponse> handleCodigoIncorreto(
+    public ResponseEntity<ErroResponse> handleCodigoIncorreto(
             CodigoIncorretoExeption ex, HttpServletRequest request){
+
+        ErroResponse erro = new ErroResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EmailEnvioExeption.class)
+    public ResponseEntity<ErroResponse> handleEmailEnvio(
+            EmailEnvioExeption ex, HttpServletRequest request){
 
         ErroResponse erro = new ErroResponse(
                 HttpStatus.NOT_FOUND.value(),
