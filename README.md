@@ -4,267 +4,160 @@
   </a>
 </p>
 
-
 # FinancialManagement
 
-API REST para gerenciamento financeiro pessoal desenvolvida com **Java, Spring Boot, Spring Security, JWT, JPA/Hibernate e MySQL**.
+API REST para controle financeiro pessoal: o usuário cadastra receitas e despesas e consulta o saldo do mês. Tem autenticação com JWT e verificação de e-mail por código.
 
-O projeto permite cadastrar usuários, autenticar com JWT, verificar e-mail, cadastrar receitas e despesas, atualizar e excluir contas e consultar um resumo financeiro.
+![Java](https://img.shields.io/badge/Java-25-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-green)
+![MySQL](https://img.shields.io/badge/MySQL-Aiven-blue)
+![Deploy](https://img.shields.io/badge/Deploy-Render-purple)
 
-## Tecnologias utilizadas
+**API online:** https://financialmanagement-7isv.onrender.com
+**Documentação interativa (Swagger):** https://financialmanagement-7isv.onrender.com/swagger-ui.html
 
-* Java 25
-* Spring Boot 4.1.0
-* Spring Web MVC
-* Spring Data JPA
-* Hibernate
-* Spring Security
-* JWT com JJWT
-* BCrypt
-* Bean Validation
-* Spring Mail
-* MySQL
-* Maven
-* Docker
-* Render
-* Aiven MySQL
+> O deploy usa o plano gratuito do Render. Depois de um tempo sem uso, a primeira requisição pode levar alguns segundos enquanto o serviço volta a subir.
 
 ## Funcionalidades
 
-* Cadastro de usuários
-* Criptografia de senha com BCrypt
-* Login com e-mail e senha
-* Autenticação utilizando JWT
-* Proteção de endpoints com Spring Security
-* Verificação de e-mail por código
-* Alteração de e-mail
-* Cadastro de receitas e despesas
-* Listagem de contas
-* Atualização do valor de uma conta
-* Exclusão de contas
-* Cálculo de total de receitas
-* Cálculo de total de despesas
-* Cálculo de saldo
-* Tratamento global de exceções
-* Persistência de dados com MySQL
-* Deploy utilizando Docker
+- Cadastrar usuário com senha criptografada (BCrypt)
+- Verificar o e-mail com um código de 6 dígitos, válido por 15 minutos
+- Fazer login e receber um token JWT, válido por 1 hora
+- Bloquear o login de quem ainda não verificou o e-mail
+- Cadastrar, listar, atualizar o valor e excluir receitas e despesas
+- Calcular total de receitas, total de despesas e saldo
+- Trocar o e-mail da conta, exigindo nova verificação
+
+## Tecnologias
+
+- Java 25, Spring Boot 4.1
+- Spring Web MVC, Spring Data JPA, Bean Validation
+- Spring Security + JWT (JJWT 0.12) + BCrypt
+- MySQL hospedado na Aiven
+- Envio de e-mail pela API do Resend
+- springdoc-openapi (Swagger UI)
+- JUnit 5 + Mockito
+- Docker + Render
 
 ## Arquitetura
 
-O projeto utiliza uma organização em camadas:
-
 ```text
-controller
-    ↓
-service
-    ↓
-repository
-    ↓
-database
+Controller  ->  Service  ->  Repository  ->  MySQL
 ```
-
-Estrutura principal:
 
 ```text
 src/main/java/io/lucascarvalho_oliveira/FinancialManagement
-
-├── config
-├── controller
-├── dto
-├── exception
-├── model
-├── repository
-└── service
+├── config       # Spring Security, filtro JWT, BCrypt
+├── controller   # endpoints REST
+├── dto          # objetos de entrada e saída
+├── exception    # exceções de negócio e @RestControllerAdvice
+├── model        # entidades JPA (Pessoa, Conta, CodigoVerificacao)
+├── repository   # Spring Data JPA
+└── service      # regras de negócio, JWT e envio de e-mail
 ```
 
-## Autenticação
+Relacionamento principal: `Pessoa 1 ── N Conta`. Cada conta é do tipo `RECEITA` ou `DESPESA`.
 
-O sistema utiliza autenticação baseada em **JWT (JSON Web Token)**.
-
-Fluxo:
+### Fluxo de autenticação
 
 ```text
-Usuário
-   ↓
-POST /pessoa/login
-   ↓
-E-mail + senha
-   ↓
-Validação da senha com BCrypt
-   ↓
-Verificação do e-mail
-   ↓
-Geração do JWT
-   ↓
-Token retornado ao cliente
+Cadastro -> pede código -> e-mail com código -> valida código -> e-mail verificado
+                                                                       |
+                                                                     Login
+                                                                       |
+                                                   senha conferida com BCrypt
+                                                                       |
+                                                                  token JWT
 ```
 
-Para acessar endpoints protegidos:
+Nos endpoints protegidos, envie o token no cabeçalho:
 
 ```http
 Authorization: Bearer SEU_TOKEN_JWT
 ```
 
-## Verificação de e-mail
+## Como rodar
 
-Fluxo:
+**Pré-requisitos:** JDK 25, MySQL e uma chave de API do [Resend](https://resend.com).
 
-```text
-Usuário solicita código
-        ↓
-Código é gerado
-        ↓
-Código + expiração são armazenados
-        ↓
-E-mail é enviado
-        ↓
-Usuário informa o código
-        ↓
-Sistema valida o código
-        ↓
-E-mail é marcado como verificado
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/lucascarvalho-oliveira/FinancialManagement.git
+cd FinancialManagement
+```
+
+2. Crie as tabelas no banco. O Hibernate está em `ddl-auto: validate`, então ele confere as tabelas, mas não cria.
+
+3. Defina as variáveis de ambiente:
+
+| Variável | Exemplo |
+|---|---|
+| `DB_URL` | `jdbc:mysql://localhost:3306/financial` |
+| `DB_USERNAME` | `root` |
+| `DB_PASSWORD` | `sua_senha` |
+| `JWT_SECRET` | uma chave com pelo menos 32 caracteres |
+| `RESEND_API_KEY` | `re_xxxxxxxx` |
+| `PORT` | `8080` (opcional) |
+
+4. Rode a aplicação:
+
+```bash
+./mvnw spring-boot:run
+```
+
+A API sobe em http://localhost:8080 e o Swagger em http://localhost:8080/swagger-ui.html.
+
+Com Docker:
+
+```bash
+docker build -t financial-management .
+docker run -p 8080:8080 --env-file .env financial-management
 ```
 
 ## Principais endpoints
 
-### Cadastrar usuário
+A lista completa, com exemplos de requisição e resposta, está no [Swagger](https://financialmanagement-7isv.onrender.com/swagger-ui.html).
 
-```http
-POST /pessoa/salvar
+| Método | Rota | Descrição | Login |
+|---|---|---|---|
+| POST | `/pessoa/salvar` | Cadastra usuário | não |
+| POST | `/email/emailPessoa` | Envia o código de verificação | não |
+| POST | `/email/validacao` | Valida o código | não |
+| POST | `/pessoa/login` | Gera o token JWT | não |
+| PUT | `/pessoa/atualizar` | Troca o e-mail | não |
+| GET | `/pessoa/resumo/{id}` | Totais e saldo | sim |
+| POST | `/conta/salvar` | Cadastra receita ou despesa | sim |
+| GET | `/conta/listar` | Lista as contas | sim |
+| PUT | `/conta/atualizar/{id}/valor` | Atualiza o valor | sim |
+| DELETE | `/conta/delete/{id}` | Exclui a conta | sim |
+
+## Testes
+
+```bash
+./mvnw test
 ```
 
-### Login
+Hoje os testes cobrem o `CodigoVerificacaoService`, com Mockito: código válido, código incorreto e código expirado.
 
-```http
-POST /pessoa/login
-```
+## Decisões técnicas
 
-### Atualizar e-mail
+- **Resend em vez de SMTP:** o plano gratuito do Render bloqueia o envio de e-mail por SMTP. O Resend envia por uma API HTTP, que funciona nesse ambiente.
+- **`BigDecimal` para valores:** `double` gera erro de arredondamento em dinheiro.
+- **Verificação de e-mail por código:** [por que escolheu esse fluxo]
+- **Banco MySQL na Aiven:** [por que escolheu a Aiven]
 
-```http
-PUT /pessoa/atualizar
-```
+## Limitações e próximos passos
 
-### Resumo financeiro
-
-```http
-GET /pessoa/resumo/{id}
-```
-
-### Enviar código de verificação
-
-```http
-POST /email/emailPessoa
-```
-
-### Validar código
-
-```http
-POST /email/validacao
-```
-
-### Cadastrar conta
-
-```http
-POST /conta/salvar
-```
-
-### Listar contas
-
-```http
-GET /conta/listar
-```
-
-### Atualizar valor
-
-```http
-PUT /conta/atualizar/{id}/valor
-```
-
-### Excluir conta
-
-```http
-DELETE /conta/delete/{id}
-```
-
-## Banco de dados
-
-O projeto utiliza MySQL hospedado na **Aiven**.
-
-Principais tabelas:
-
-```text
-pessoa
-conta
-codigo_verificacao
-```
-
-Relacionamento principal:
-
-```text
-Pessoa 1 ───── N Conta
-```
-
-## Deploy no Render
-
-A aplicação está hospedada no **Render** utilizando Docker.
-
-Arquitetura:
-
-```text
-Cliente / Postman
-        ↓
-Render
-        ↓
-Container Docker
-        ↓
-Spring Boot
-        ↓
-Aiven MySQL
-```
-
-API online:
-
-```text
-https://financialmanagement-7isv.onrender.com
-```
-
-O Render utiliza o `Dockerfile` presente no repositório para construir e executar a aplicação.
-
-As variáveis de ambiente são configuradas diretamente no painel do Render.
-
-> Como o projeto utiliza uma instância gratuita do Render, a primeira requisição após um período de inatividade pode levar alguns segundos enquanto o serviço é iniciado novamente.
-
-## Tratamento de erros
-
-O projeto utiliza `@RestControllerAdvice` para tratamento global de exceções.
-
-Entre os erros tratados estão:
-
-* Pessoa não encontrada
-* Pessoa já existente
-* Senha inválida
-* Conta não encontrada
-* Código de verificação incorreto
-
-## Objetivo do projeto
-
-O projeto foi desenvolvido para consolidar conhecimentos de desenvolvimento back-end, incluindo:
-
-* APIs REST
-* arquitetura em camadas
-* JPA/Hibernate
-* Spring Security
-* JWT
-* BCrypt
-* envio e validação de e-mails
-* tratamento de exceções
-* Docker
-* banco de dados em nuvem
-* deploy de aplicações Spring Boot
+- **Falta checar o dono dos dados.** Qualquer usuário logado consegue listar as contas de todos os usuários, ver o resumo de outra pessoa pelo `id` e alterar ou excluir contas que não são dele. Próximo passo: pegar o usuário pelo token JWT e filtrar por ele.
+- **O cadastro devolve a entidade inteira**, incluindo o hash da senha. Próximo passo: responder com um DTO.
+- **Poucos testes:** só o serviço de verificação está coberto. Faltam `PessoaService`, `ContaService` e testes dos controllers.
+- **Migração para PostgreSQL** planejada, ainda não feita.
 
 ## Autor
 
 **Lucas Carvalho**
 
-GitHub: `lucascarvalho-oliveira`
+- LinkedIn: [linkedin.com/in/lucas-carvalho-jesus](https://www.linkedin.com/in/lucas-carvalho-jesus)
+- E-mail: lucascarvalhoptc09@gmail.com
+- GitHub: [lucascarvalho-oliveira](https://github.com/lucascarvalho-oliveira)
